@@ -1,7 +1,7 @@
 {
-  "name": "Hệ Thống Tính Tiền Nông Sản Tuna",
-  "short_name": "Shop Tuna",
-  "description": "Ứng dụng quản lý hóa đơn, tính tiền thu mua nông sản chuyên nghiệp.",
+  "name": "Xuất hóa đơn Nông trại PTG",
+  "short_name": "Xuất hóa đơn",
+  "description": "Ứng dụng tạo hóa đơn, tính tiền thu mua nông sản.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f5ebe0",
@@ -9,13 +9,13 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2674/2674486.png",
+      "src": "nhan_sam.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2674/2674486.png",
+      "src": "nhan_sam.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
