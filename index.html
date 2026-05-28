@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>POS PTG</title>
+    <title>ShopTuna Prime - POS System</title>
     
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#2563eb">
@@ -248,7 +248,7 @@
             <button class="nav-btn active" onclick="switchView('pos')">🛒<span>POS</span></button>
             <button class="nav-btn" onclick="switchView('customers')">👥<span>Khách</span></button>
             <button class="nav-btn" onclick="switchView('history')">📜<span>Lịch sử</span></button>
-            <button class="nav-btn" onclick="switchView('settings')">⚙️<span>Cài đặt</span></button>
+            <button class="nav-btn" onclick="switchView('settings')">⚙️<span>Kho</span></button>
         </div>
     </nav>
 
@@ -259,7 +259,7 @@
                 
                 <div class="products-area">
                     <div class="top-bar">
-                        <h1 class="page-title" id="ui-shop-name">Shop</h1>
+                        <h1 class="page-title" id="ui-shop-name">ShopTuna</h1>
                         
                         <div class="mode-switch">
                             <button id="btn-mode-buy" class="m-btn buy active" onclick="setPosMode('buy')">⏬ Thu Mua</button>
@@ -267,6 +267,7 @@
                         </div>
                         
                         <div style="display: flex; gap: 8px;">
+                            <button class="btn-action-outline" onclick="openPriceList()">📋 Xuất Bảng Giá</button>
                             <button class="btn-action-outline" style="border-color: var(--primary); color: var(--primary);" onclick="openProductModal('add')">➕ Thêm SP</button>
                             <button class="btn-action-outline" onclick="clearCart()">Làm Mới</button>
                         </div>
@@ -284,7 +285,7 @@
                     <div class="cart-header">
                         <div class="customer-selector">
                             <input type="text" id="cart_customer" class="c-input" placeholder="Khách Hàng / Nhập tên" oninput="updateCartUI()">
-                            <button class="btn-icon-sq" onclick="switchView('customers')">👥</button>
+                            <button class="btn-icon-sq" onclick="openCustomerSearchModal()" title="Tìm Khách Hàng">👥</button>
                         </div>
                         <div class="modifiers">
                             <input type="number" id="cart_bonus" class="mod-input" placeholder="% Thưởng (+)" oninput="updateCartUI()">
@@ -301,8 +302,8 @@
                         <div id="dynamic-pay-zone"></div>
 
                         <div class="summary-row"><span>Tạm tính</span><span id="c-subtotal">0đ</span></div>
-                        <div class="summary-row highlight" id="c-bonus-row"><span id="lbl_mod_txt">Bonus</span><span id="c-bonus" style="color:var(--secondary);">+0đ</span></div>
-                        <div class="grand-total" id="c-grand-box"><span id="lbl_grand_txt">Tổng</span><span id="c-total">0đ</span></div>
+                        <div class="summary-row highlight" id="c-bonus-row"><span id="lbl_mod_txt">Thưởng thêm</span><span id="c-bonus" style="color:var(--secondary);">+0đ</span></div>
+                        <div class="grand-total" id="c-grand-box"><span id="lbl_grand_txt">Thực Trả Khách</span><span id="c-total">0đ</span></div>
                         <button class="btn-checkout" id="btn-create-bill" style="background:var(--secondary);" onclick="openReceipt()">Tạo Hóa Đơn Thu Mua</button>
                     </div>
                 </div>
@@ -317,11 +318,9 @@
         <div class="view-section" id="view-customers">
             <div class="crud-view">
                 <div class="card-panel">
-                    <div class="panel-title">👥 Quản Lý Sổ Khách</div>
-                    <div class="input-group">
-                        <input type="text" id="cfg_cus_name" class="c-input" style="flex:2" placeholder="Tên Khách Hàng">
-                        <input type="number" id="cfg_cus_bonus" class="c-input" style="flex:1" placeholder="% Thưởng/Giảm">
-                        <button class="btn-action" onclick="addCustomer()">Lưu Khách</button>
+                    <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                        <span>👥 Quản Lý Sổ Khách</span>
+                        <button class="btn-action-outline" style="border-color:var(--primary); color:var(--primary); padding:6px 12px; font-size:12px;" onclick="openCustomerEditModal('add')">➕ Thêm Khách</button>
                     </div>
                     <ul class="data-list" id="list-customers"></ul>
                 </div>
@@ -455,6 +454,75 @@
         </div>
     </div>
 
+    <!-- ================= MODAL THÊM / SỬA KHÁCH HÀNG ================= -->
+    <div class="modal-overlay" id="modal-customer-edit">
+        <div class="p-modal-card">
+            <div class="panel-title" id="cm-title" style="margin-bottom:0; padding-bottom:8px;">➕ Thêm Khách Hàng</div>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                    <label style="font-size:12px; font-weight:700; color:var(--text-muted)">Tên Khách Hàng *</label>
+                    <input type="text" id="cm_name" class="c-input" placeholder="Nhập tên khách hàng...">
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                    <label style="font-size:12px; font-weight:700; color:var(--text-muted)">ID Tiktok / SĐT Zalo *</label>
+                    <input type="text" id="cm_contact" class="c-input" placeholder="Nhập thông tin liên hệ...">
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                    <label style="font-size:12px; font-weight:700; color:var(--text-muted)">ID Game (Tùy chọn)</label>
+                    <input type="text" id="cm_gameid" class="c-input" placeholder="Nhập ID Game (nếu có)...">
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                    <label style="font-size:12px; font-weight:700; color:var(--text-muted)">% Thưởng/Giảm mặc định</label>
+                    <input type="number" id="cm_bonus" class="c-input" placeholder="0">
+                </div>
+            </div>
+            <div style="display:flex; justify-content:flex-end; align-items:center; margin-top:8px; gap:8px;">
+                <button class="btn-action-outline" onclick="closeCustomerEditModal()">Hủy</button>
+                <button class="btn-action" onclick="saveCustomer()">Lưu Khách Hàng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL TÌM KIẾM KHÁCH HÀNG TRÊN POS ================= -->
+    <div class="modal-overlay" id="modal-customer-search">
+        <div class="p-modal-card" style="max-height: 85vh; display: flex; flex-direction: column;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:12px;">
+                <span style="font-weight:800; font-size:16px;">🔍 Sổ Khách Hàng</span>
+                <button class="btn-close-cart" style="width:28px; height:28px; font-size:16px;" onclick="closeCustomerSearchModal()">×</button>
+            </div>
+            <input type="text" id="cs_search_input" class="c-input" placeholder="Tìm tên, liên hệ hoặc ID Game..." oninput="renderCustomerSearchList()">
+            <ul class="data-list" id="cs_search_results" style="overflow-y:auto; flex:1; margin-top:12px; display:flex; flex-direction:column; gap:8px; list-style:none;"></ul>
+        </div>
+    </div>
+
+    <!-- ================= MODAL BẢNG GIÁ ================= -->
+    <div class="modal-overlay" id="modal-pricelist">
+        <div class="modal-content">
+            <div class="receipt-scroll-wrapper">
+                <div class="receipt-paper" id="pricelist-print-area">
+                    <div class="r-head">
+                        <div class="r-brand" id="pl-shop">SHOP TUNA</div>
+                        <div class="r-sub" id="pl-title-type" style="background:var(--secondary); color:white;">BẢNG GIÁ THU MUA</div>
+                    </div>
+                    <div class="r-meta" style="margin-bottom: 12px; text-align: center; border-bottom: 1px dashed #cbd5e1; padding-bottom: 12px;">
+                        <span style="justify-content: center; color: var(--text-muted);">Cập nhật lúc: <strong id="pl-time" style="margin-left: 6px; color: #000;">--/--/----</strong></span>
+                    </div>
+                    <table class="r-table" style="margin-bottom: 10px;">
+                        <tbody id="pl-tbody"></tbody>
+                    </table>
+                    <div class="r-foot" style="margin-top: 20px;">
+                        <span id="pl-notice" style="display:none; font-weight:700; color:#0f172a; margin-bottom: 6px;"></span>
+                        <span>Bảng giá áp dụng tại thời điểm xuất.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal btn-close-r" onclick="closePriceList()">Quay Lại</button>
+                <button class="btn-modal btn-dl-r" onclick="downloadPriceList()">Tải Ảnh Bảng Giá</button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="modal-receipt">
         <div class="modal-content">
             
@@ -476,16 +544,16 @@
                     <div class="r-sum">
                         <div class="r-line" id="r-sub-line" style="display:none;"><span>Tạm tính</span><span id="r-sub">0đ</span></div>
                         <div class="r-line" id="r-disc-line" style="display:none; color:var(--secondary);">
-                            <span id="r-lbl-mod">Bonus (+<span id="r-pct">0</span>%)</span>
+                            <span id="r-lbl-mod">Thưởng (+<span id="r-pct">0</span>%)</span>
                             <span id="r-disc">+0đ</span>
                         </div>
-                        <div class="r-total"><span id="r-lbl-total">Tổng</span><span id="r-grand" style="color:var(--secondary);">0đ</span></div>
+                        <div class="r-total"><span id="r-lbl-total">THỰC TRẢ</span><span id="r-grand" style="color:var(--secondary);">0đ</span></div>
                     </div>
                     <div class="r-pay-info" id="r-pay-box"></div>
                     <div class="r-foot">
                         <span id="r-note" style="display:none; font-style:italic; color:#0f172a; margin-bottom: 6px;"></span>
                         <span id="r-notice" style="display:none; font-weight:700; color:#0f172a; margin-bottom: 6px;"></span>
-                        <span>Cảm ơn sự ủng hộ của bạn!</span>
+                        <span>Cảm ơn sự hợp tác của bạn!</span>
                     </div>
                     
                     <div id="r-qrcode-zone" style="display:none; text-align:center; margin-top:20px; border-top:2px dashed #cbd5e1; padding-top:15px;">
@@ -649,7 +717,7 @@
 
             if (posMode === 'buy') {
                 select.innerHTML = `
-                    <option value="none">💵 Chọn phương thức</option>
+                    <option value="none">💵 Tiền Mặt / Tự do</option>
                     <option value="bank">💳 Chuyển Khoản Ngân Hàng (Trả Khách)</option>
                     <option value="zing">🎫 Trả bằng Thẻ Zing</option>
                     <option value="pack">📦 Trả bằng Gói Game</option>
@@ -657,8 +725,8 @@
                 if(['none','bank','zing','pack'].includes(currentVal)) select.value = currentVal;
             } else {
                 select.innerHTML = `
-                    <option value="none">💵 Chọn phương thức</option>
-                    <option value="my_bank">💳 Quét Mã VietQR</option>
+                    <option value="none">💵 Tiền Mặt / Tự do</option>
+                    <option value="my_bank">💳 Quét Mã VietQR (Khách trả mình)</option>
                 `;
                 if(['none','my_bank'].includes(currentVal)) select.value = currentVal;
                 else if(currentVal === 'bank') select.value = 'my_bank';
@@ -996,6 +1064,57 @@
 
         function closeReceipt() { document.getElementById('modal-receipt').style.display='none'; }
         
+        // --- PRICE LIST ENGINE (XUẤT BẢNG GIÁ) ---
+        function openPriceList() {
+            document.getElementById('pl-shop').innerText = (appData.shopName || "SHOP TUNA").toUpperCase();
+            
+            let d = new Date();
+            document.getElementById('pl-time').innerText = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+            
+            const typeBox = document.getElementById('pl-title-type');
+            const color = posMode === 'buy' ? 'var(--secondary)' : 'var(--primary)';
+            typeBox.innerText = posMode === 'buy' ? 'BẢNG GIÁ THU MUA' : 'BẢNG GIÁ BÁN RA';
+            typeBox.style.background = color;
+
+            const ntb = document.getElementById('pl-notice');
+            if(appData.notice){ ntb.style.display='block'; ntb.innerText="* Lưu ý: "+appData.notice; } else ntb.style.display='none';
+
+            const tb = document.getElementById('pl-tbody');
+            tb.innerHTML = '';
+            
+            appData.categories.forEach(c => {
+                if (c.items.length === 0) return;
+                // Nhóm theo Category
+                tb.innerHTML += `<tr><td colspan="2" style="background:#f1f5f9; font-weight:800; padding:8px; text-transform:uppercase; font-size:12px; border-bottom: 1px solid #000;">📁 ${c.name}</td></tr>`;
+                
+                // Liệt kê Items
+                c.items.forEach(i => {
+                    let p = getActivePrice(i.price);
+                    let pTxt = i.unit.toLowerCase() === 'xu' ? `${formatMoney(p*1000000)} / 1M` : `${formatMoney(p)} / ${i.unit}`;
+                    tb.innerHTML += `<tr><td style="padding-left:12px; padding-top:12px; padding-bottom:12px; border-bottom: 1px dashed #cbd5e1;">${i.icon || '📦'} ${i.name}</td><td class="t-right" style="font-weight:700; color:${color}; border-bottom: 1px dashed #cbd5e1; padding-top:12px; padding-bottom:12px;">${pTxt}</td></tr>`;
+                });
+            });
+
+            document.getElementById('modal-pricelist').style.display = 'flex';
+        }
+
+        function closePriceList() {
+            document.getElementById('modal-pricelist').style.display = 'none';
+        }
+
+        function downloadPriceList() {
+            html2canvas(document.getElementById('pricelist-print-area'), { 
+                scale: 2, 
+                backgroundColor: "#ffffff",
+                useCORS: true 
+            }).then(canvas => {
+                const a = document.createElement('a'); 
+                a.download = `BangGia_${posMode.toUpperCase()}_${Date.now()}.png`; 
+                a.href = canvas.toDataURL(); 
+                a.click();
+            });
+        }
+        
         function downloadReceipt() {
             html2canvas(document.getElementById('print-area'), { 
                 scale: 2, 
@@ -1072,14 +1191,153 @@
             }
         }
 
-        // --- SETTINGS & CUSTOMERS CRUD ---
+        // --- CUSTOMER ENGINE (SEARCH & CRUD) ---
+        let editingCustId = null;
+
+        function openCustomerEditModal(mode, id = null) {
+            if(mode === 'add') {
+                editingCustId = null;
+                document.getElementById('cm-title').innerText = "➕ Thêm Khách Hàng";
+                document.getElementById('cm_name').value = '';
+                document.getElementById('cm_contact').value = '';
+                document.getElementById('cm_gameid').value = '';
+                document.getElementById('cm_bonus').value = '';
+            } else {
+                editingCustId = id;
+                let c = appData.customers.find(x => x.id === id);
+                if(!c) return;
+                document.getElementById('cm-title').innerText = "📝 Sửa Khách Hàng";
+                document.getElementById('cm_name').value = c.name || '';
+                document.getElementById('cm_contact').value = c.contact || '';
+                document.getElementById('cm_gameid').value = c.gameId || '';
+                document.getElementById('cm_bonus').value = c.bonus || 0;
+            }
+            document.getElementById('modal-customer-edit').style.display = 'flex';
+        }
+
+        function closeCustomerEditModal() { document.getElementById('modal-customer-edit').style.display = 'none'; }
+
+        function saveCustomer() {
+            let n = document.getElementById('cm_name').value.trim();
+            let contact = document.getElementById('cm_contact').value.trim();
+            let gId = document.getElementById('cm_gameid').value.trim();
+            let b = parseFloat(document.getElementById('cm_bonus').value) || 0;
+
+            if(!n || !contact) {
+                alert("Vui lòng nhập Tên và ID Tiktok/SĐT Zalo!");
+                return;
+            }
+
+            // Ràng buộc 1 trong 3 tồn tại
+            let dup = appData.customers.find(c =>
+                c.id !== editingCustId && (
+                    (c.name.toLowerCase() === n.toLowerCase()) ||
+                    (c.contact && c.contact.toLowerCase() === contact.toLowerCase()) ||
+                    (gId && c.gameId && c.gameId.toLowerCase() === gId.toLowerCase())
+                )
+            );
+
+            if(dup) {
+                alert("Lỗi: Đã tồn tại khách hàng này (Trùng Tên, Tiktok/Zalo hoặc ID Game)!");
+                return;
+            }
+
+            if(editingCustId) {
+                let c = appData.customers.find(x => x.id === editingCustId);
+                if(c) { c.name = n; c.contact = contact; c.gameId = gId; c.bonus = b; }
+            } else {
+                appData.customers.push({ id: 'u' + Date.now(), name: n, contact: contact, gameId: gId, bonus: b });
+            }
+
+            saveDb();
+            renderCustomersView();
+            closeCustomerEditModal();
+            // Nêú đang mở modal search thì update luôn list
+            if(document.getElementById('modal-customer-search').style.display === 'flex') {
+                renderCustomerSearchList();
+            }
+        }
+
         function renderCustomersView() {
             const ul = document.getElementById('list-customers'); ul.innerHTML='';
-            appData.customers.forEach(c => { ul.innerHTML += `<li class="data-li"><span><b>${c.name}</b> <span style="color:var(--text-muted)">(${c.bonus}%)</span></span> <div><button class="btn-action" style="padding:6px 12px;font-size:12px; margin-right:6px;" onclick="selCust('${c.name}', ${c.bonus})">Chọn</button><button class="btn-del" onclick="remCust('${c.id}')">Xóa</button></div></li>`; });
+            appData.customers.forEach(c => {
+                let meta = [];
+                if(c.contact) meta.push(`📞 ${c.contact}`);
+                if(c.gameId) meta.push(`🎮 ${c.gameId}`);
+                let metaStr = meta.length ? `<div style="font-size:11px; color:var(--text-muted); margin-top:6px;">${meta.join(' | ')}</div>` : '';
+
+                ul.innerHTML += `<li class="data-li" style="flex-direction:column; align-items:flex-start; padding:16px;">
+                    <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                        <span><b style="font-size:15px; color:var(--text-main);">${c.name}</b> <span style="color:var(--secondary); font-size:12px; font-weight:800;">(${c.bonus}%)</span></span>
+                        <div>
+                            <button class="btn-action-outline" style="padding:6px 12px; font-size:12px; margin-right:6px;" onclick="openCustomerEditModal('edit', '${c.id}')">Sửa</button>
+                            <button class="btn-del" onclick="remCust('${c.id}')">Xóa</button>
+                        </div>
+                    </div>
+                    ${metaStr}
+                </li>`;
+            });
         }
-        function addCustomer() { const n=document.getElementById('cfg_cus_name').value, b=parseFloat(document.getElementById('cfg_cus_bonus').value)||0; if(n){ appData.customers.push({id:'u'+Date.now(),name:n,bonus:b}); saveDb(); renderCustomersView(); document.getElementById('cfg_cus_name').value=''; } }
-        function remCust(id) { appData.customers = appData.customers.filter(c=>c.id!==id); saveDb(); renderCustomersView(); }
-        function selCust(n, b) { document.getElementById('cart_customer').value=n; document.getElementById('cart_bonus').value=b; updateCartUI(); switchView('pos'); document.getElementById('cart-panel').classList.remove('open'); }
+
+        function remCust(id) { 
+            if(confirm("Xóa khách hàng này?")) {
+                appData.customers = appData.customers.filter(c=>c.id!==id); 
+                saveDb(); 
+                renderCustomersView(); 
+            }
+        }
+
+        // --- POS CUSTOMER SEARCH MODAL ---
+        function openCustomerSearchModal() {
+            document.getElementById('cs_search_input').value = '';
+            renderCustomerSearchList();
+            document.getElementById('modal-customer-search').style.display = 'flex';
+            setTimeout(() => document.getElementById('cs_search_input').focus(), 100);
+        }
+
+        function closeCustomerSearchModal() { document.getElementById('modal-customer-search').style.display = 'none'; }
+
+        function renderCustomerSearchList() {
+            let kw = document.getElementById('cs_search_input').value.toLowerCase().trim();
+            const ul = document.getElementById('cs_search_results');
+            ul.innerHTML = '';
+
+            let filtered = appData.customers.filter(c =>
+                c.name.toLowerCase().includes(kw) ||
+                (c.contact && c.contact.toLowerCase().includes(kw)) ||
+                (c.gameId && c.gameId.toLowerCase().includes(kw))
+            );
+
+            if(filtered.length === 0) {
+                ul.innerHTML = `<li style="text-align:center; padding:20px; font-size:13px; color:var(--text-muted);">Không tìm thấy khách hàng. <br><br> <button class="btn-action-outline" onclick="openCustomerEditModal('add')">➕ Tạo Khách Mới</button></li>`;
+                return;
+            }
+
+            filtered.forEach(c => {
+                let meta = [];
+                if(c.contact) meta.push(`📞 ${c.contact}`);
+                if(c.gameId) meta.push(`🎮 ${c.gameId}`);
+                let metaStr = meta.length ? `<div style="font-size:11px; color:var(--text-muted); margin-top:4px;">${meta.join(' | ')}</div>` : '';
+
+                ul.innerHTML += `<li class="data-li" style="flex-direction:column; align-items:flex-start; cursor:pointer; border:1px solid transparent; transition:0.2s;" onclick="selectCustomerPOS('${c.id}')" onmouseover="this.style.borderColor='var(--primary)'; this.style.background='#eff6ff'" onmouseout="this.style.borderColor='transparent'; this.style.background='var(--bg-base)'">
+                    <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                        <span style="font-weight:800;">${c.name}</span>
+                        <span style="color:var(--secondary); font-size:12px; font-weight:800;">Tỉ lệ: ${c.bonus}%</span>
+                    </div>
+                    ${metaStr}
+                </li>`;
+            });
+        }
+
+        function selectCustomerPOS(id) {
+            let c = appData.customers.find(x => x.id === id);
+            if(c) {
+                document.getElementById('cart_customer').value = c.name;
+                document.getElementById('cart_bonus').value = c.bonus || 0;
+                updateCartUI();
+            }
+            closeCustomerSearchModal();
+        }
 
         function renderSettingsView() {
             document.getElementById('cfg_shop_name').value = appData.shopName || ""; 
